@@ -1,0 +1,72 @@
+[project]
+name = "rag-assistant"
+version = "0.1.0"
+description = "A Mid-Pro RAG Knowledge Assistant built with Python 3.11+, FastAPI, ChromaDB, and modern engineering practices."
+authors = [
+    { name = "Carlos David Tamayo Montañez" }
+]
+requires-python = ">=3.11"
+license = { text = "MIT" }
+readme = "README.md"
+
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.29.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "python-dotenv>=1.0.1",
+    "chromadb>=0.5.0",
+    "sentence-transformers>=2.5.1",
+    "numpy>=1.26.0",
+    "pypdf>=4.0.0",
+    "python-docx>=1.1.0",
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "mypy>=1.8.0",
+    "ruff>=0.4.0",
+    "black>=24.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ----------------------------------
+# EN: Tooling configuration
+# FR: Configuration des outils
+# ----------------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4"]
+ignore = ["E501"]  # Let Black/Ruff formatter handle line length
+
+[tool.ruff.lint.isort]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+preview = true
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_configs = true
+# Optional: Relax slightly for Pydantic/FastAPI patterns if needed
+# disallow_any_generics = false
+# warn_return_any = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"  # ← Add this for pytest-asyncio >= 0.24
+testpaths = ["tests"]
+addopts = "--tb=short"

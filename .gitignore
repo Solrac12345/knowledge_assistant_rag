@@ -1,0 +1,21 @@
+# Environment variables
+.env
+!.env.example
+
+# ChromaDB data
+data/chroma/
+*.chroma
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+EOFrag_assistant.egg-info/
+uv.lock

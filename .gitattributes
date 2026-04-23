@@ -1,0 +1,22 @@
+# EN: Handle line endings automatically for cross-platform compatibility.
+# FR: Gérer automatiquement les fins de ligne pour la compatibilité multiplateforme.
+* text=auto eol=lf
+
+# EN: Force binary files to be treated as binary.
+# FR: Forcer les fichiers binaires à être traités comme binaires.
+*.pdf binary
+*.docx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pyd binary
+*.so binary
+*.dll binary
+*.chroma binary
+
+# EN: Keep Windows-specific files with CRLF.
+# FR: Conserver les fichiers Windows avec CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
