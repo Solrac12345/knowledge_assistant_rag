@@ -1,23 +1,32 @@
-# EN: Placeholder for LLM client abstraction.
-# FR: Espace réservé pour l'abstraction du client LLM.
+# EN: LLM client abstraction for the RAG pipeline.
+# FR: Abstraction de client LLM pour le pipeline RAG.
 
-class LLMClient:
+from typing import Protocol
+
+
+class LLMClient(Protocol):
     """
-    EN: Abstract interface for interacting with Large Language Models.
-    FR: Interface abstraite pour interagir avec les grands modèles de langage.
+    EN: Protocol defining the interface for any LLM client.
+    FR: Protocole définissant l'interface pour tout client LLM.
     """
 
     def generate(self, prompt: str) -> str:
         """
-        EN: Generate a response from the LLM based on the input prompt.
-        FR: Générer une réponse du LLM basée sur le prompt d'entrée.
-
-        Args:
-            prompt: The text prompt to send to the model.
-
-        Returns:
-            The generated text response.
+        EN: Generate a response given a prompt.
+        FR: Générer une réponse à partir d'un prompt.
         """
-        # EN: Will call the real LLM in Phase 2.
-        # FR: Appellera le vrai LLM dans la Phase 2.
-        return "LLM response placeholder"
+        ...
+
+
+class DummyLLMClient:
+    """
+    EN: Simple placeholder LLM client used during early development.
+    FR: Client LLM factice utilisé pendant le développement initial.
+    """
+
+    def generate(self, prompt: str) -> str:
+        """
+        EN: Return a deterministic placeholder response.
+        FR: Retourner une réponse factice déterministe.
+        """
+        return f"[DUMMY LLM RESPONSE] {prompt[:200]}"
