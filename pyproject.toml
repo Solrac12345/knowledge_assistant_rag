@@ -47,7 +47,10 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "C4"]
-ignore = ["E501"]  # Let Black/Ruff formatter handle line length
+ignore = [
+    "E501",  # Handled by Black/Ruff formatter
+    "B008",  # FastAPI dependency markers (File, Form, Query, etc.) intentionally use function calls
+]
 
 [tool.ruff.lint.isort]
 
