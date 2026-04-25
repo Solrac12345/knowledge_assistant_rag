@@ -1,0 +1,115 @@
+# EN: CI/CD pipeline for RAG Knowledge Assistant
+# FR: Pipeline CI/CD pour l'Assistant de Connaissance RAG
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# EN: Cancel in-progress runs when new commits are pushed
+# FR: Annuler les exécutions en cours lorsque de nouveaux commits sont poussés
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # EN: Code Quality Checks (Linting + Formatting + Types)
+  # FR: Vérifications de qualité de code (Linting + Formatage + Types)
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.11"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Run Ruff (linting + imports)
+        run: uv run ruff check app/ tests/ --no-fix
+
+      - name: Run Black (formatting check)
+        run: uv run black app/ tests/ --check --diff
+
+      - name: Run mypy (type checking)
+        run: uv run mypy app/
+
+  # EN: Automated Tests with Coverage
+  # FR: Tests automatisés avec couverture de code
+  tests:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: quality  # Run tests only if quality checks pass
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          python-version: "3.11"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Run pytest with coverage
+        env:
+          LLM_PROVIDER: dummy  # Use dummy LLM for fast, deterministic tests
+          CHROMA_DB_PATH: /tmp/chroma_test
+        run: |
+          uv run pytest tests/ \
+            -v \
+            --tb=short \
+            --cov=app \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-fail-under=80
+
+      - name: Upload coverage to Codecov (optional)
+        uses: codecov/codecov-action@v4
+        if: github.repository == 'your-username/knowledge_assistant_rag'
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  # EN: Build Docker Image (Preparation for Phase 3)
+  # FR: Construire l'image Docker (Préparation pour la Phase 3)
+  docker-build:
+    name: Docker Build Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: tests  # Only build if tests pass
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'  # Only on main branch pushes
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (no push yet)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          load: true
+          tags: rag-assistant:ci-check
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

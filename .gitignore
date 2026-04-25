@@ -20,3 +20,10 @@ Thumbs.db
 EOFrag_assistant.egg-info/
 uv.lock
 .env
+
+# EN: CI/CD artifacts
+# FR: Artefacts CI/CD
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
