@@ -19,3 +19,4 @@ __pycache__/
 Thumbs.db
 EOFrag_assistant.egg-info/
 uv.lock
+.env
