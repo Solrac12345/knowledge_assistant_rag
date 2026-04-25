@@ -64,17 +64,32 @@ preview = true
 python_version = "3.11"
 strict = true
 warn_unused_configs = true
-# Optional: Relax slightly for Pydantic/FastAPI patterns if needed
-# disallow_any_generics = false
-# warn_return_any = false
+plugins = ["pydantic.mypy"]  # ← CRITICAL: Teaches mypy how to type Pydantic v2 models
+
+# Ignore missing stubs for libraries that don't ship with types
+[[tool.mypy.overrides]]
+module = [
+    "sentence_transformers.*",
+    "chromadb.*",
+    "httpx.*",
+    "pydantic_settings.*",
+    "fastapi.*",
+]
+ignore_missing_imports = true
+
+# Relax for FastAPI decorators (they use dynamic patterns)
+[[tool.mypy.overrides]]
+module = ["app.api.v1.routes_rag", "app.main"]
+disable_error_code = ["untyped-decorator"]
+
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 asyncio_mode = "auto"
-asyncio_default_fixture_loop_scope = "function"  # ← Add this for pytest-asyncio >= 0.24
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 addopts = "--tb=short"
 
 [tool.setuptools.packages.find]
-include = ["app*"]  # Only include the 'app' package and subpackages
-exclude = ["data*", "tests*", "docs*"]  # Explicitly exclude non-code directories
+include = ["app*"]
+exclude = ["data*", "tests*", "docs*"]

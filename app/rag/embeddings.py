@@ -23,7 +23,7 @@ class EmbeddingClient:
         FR: Générer un embedding pour un texte unique.
         """
         embedding = self._model.encode(text)
-        return embedding.tolist()
+        return embedding.tolist()  # type: ignore[no-any-return]
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         """
@@ -31,4 +31,4 @@ class EmbeddingClient:
         FR: Générer des embeddings pour plusieurs documents/blocs.
         """
         embeddings = self._model.encode(texts)
-        return [e.tolist() for e in embeddings]
+        return [e.tolist() for e in embeddings]  

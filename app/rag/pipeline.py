@@ -1,7 +1,8 @@
 # EN: End-to-end RAG pipeline orchestration.
 # FR: Orchestration de bout en bout du pipeline RAG.
 
-from app.llm.client import DummyLLMClient, LLMClient
+from app.llm.base import LLMClient
+from app.llm.dummy_client import DummyLLMClient
 from app.rag.chunking import recursive_chunk
 from app.rag.ingestion import ingest_document
 from app.rag.retrieval import Retriever
@@ -39,7 +40,7 @@ class RAGPipeline:
         self._store.add_documents(chunks, ids=ids)
         # PersistentClient auto-saves; .persist() is deprecated in modern ChromaDB
 
-    def answer_question(self, query: str, top_k: int = 5) -> str:
+    async def answer_question(self, query: str, top_k: int = 5) -> str:
         """
         EN: Retrieve relevant chunks and ask the LLM to answer based on them.
         FR: Récupérer les blocs pertinents et demander au LLM de répondre à partir de ceux-ci.
@@ -54,4 +55,4 @@ class RAGPipeline:
             "Answer:"
         )
 
-        return self._llm.generate(prompt)
+        return await self._llm.generate(prompt)

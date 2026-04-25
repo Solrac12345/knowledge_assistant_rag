@@ -1,35 +1,47 @@
-# EN: Main entry point of the FastAPI application.
-# FR: Point d'entrée principal de l'application FastAPI.
+# EN: FastAPI application entry point.
+# FR: Point d'entrée de l'application FastAPI.
+
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
 from app.api.v1.routes_rag import router as rag_router
-from app.core.logging import configure_logging
-from app.core.settings import settings
+from app.llm import get_llm_client
+from app.rag.pipeline import RAGPipeline
 
-# EN: Initialize logging before creating the app.
-# FR: Initialiser les logs avant de créer l'application.
-configure_logging()
 
-# EN: Create FastAPI instance with OpenAPI metadata.
-# FR: Créer l'instance FastAPI avec les métadonnées OpenAPI.
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """
+    EN: Application lifespan: Initialize RAG pipeline once at startup.
+    FR: Cycle de vie : Initialiser le pipeline RAG une seule fois au démarrage.
+    """
+    # EN: Use the factory to get the correct LLM client (Ollama or Dummy) based on .env
+    # FR: Utiliser la factory pour obtenir le client LLM correct (Ollama ou Dummy) selon .env
+    app.state.pipeline = RAGPipeline(llm_client=get_llm_client())
+
+    yield  # Application runs here
+
+
+# EN: Create FastAPI app with lifespan
+# FR: Créer l'application FastAPI avec cycle de vie
 app = FastAPI(
     title="RAG Knowledge Assistant",
+    description="A Mid-Pro RAG system built with Python 3.11+, FastAPI, ChromaDB, and Ollama.",
     version="0.1.0",
-    description="RAG system built with Python 3.11+",
-    docs_url="/docs",
-    redoc_url="/redoc",
-    openapi_url="/openapi.json",
+    lifespan=lifespan,
 )
 
-# EN: Include RAG API routes.
-# FR: Inclure les routes de l'API RAG.
-app.include_router(rag_router, prefix="/api/v1/rag")
+# EN: Include RAG router (Note: prefix matches your screenshot /api/v1/rag)
+# FR: Inclure le routeur RAG (Note: le préfixe correspond à votre screenshot)
+app.include_router(rag_router, prefix="/api/v1/rag", tags=["rag"])
 
 
-# EN: Root endpoint for health check.
-# FR: Endpoint racine pour vérifier l'état du service.
-@app.get("/")
-def root() -> dict[str, str]:
-    """Health check endpoint returning service status."""
-    return {"status": "ok", "environment": settings.environment}
+@app.get("/", tags=["health"])
+async def health_check() -> dict[str, str]:
+    """
+    EN: Basic health check.
+    FR: Vérification de santé basique.
+    """
+    return {"status": "ok", "environment": "development"}

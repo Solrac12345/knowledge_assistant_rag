@@ -2,7 +2,6 @@
 # FR: Utilitaires de découpage de texte pour le pipeline RAG.
 
 
-
 def recursive_chunk(
     text: str,
     chunk_size: int = 500,

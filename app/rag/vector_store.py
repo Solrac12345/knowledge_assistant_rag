@@ -1,63 +1,81 @@
-# EN: Vector store wrapper around ChromaDB for the RAG pipeline.
-# FR: Wrapper de base de données vectorielle autour de ChromaDB pour le pipeline RAG.
+# EN: ChromaDB vector store wrapper for the RAG pipeline.
+# FR: Wrapper ChromaDB pour la base vectorielle du pipeline RAG.
+
+import logging
+from pathlib import Path
+from typing import Optional
 
 import chromadb
+from chromadb.config import Settings as ChromaSettings
 
+from app.core.settings import settings
 from app.rag.embeddings import EmbeddingClient
+
+logger = logging.getLogger(__name__)
 
 
 class VectorStore:
     """
-    EN: Simple wrapper for a ChromaDB collection.
-    FR: Wrapper simple pour une collection ChromaDB.
+    EN: Wrapper around ChromaDB PersistentClient for document storage & retrieval.
+    FR: Wrapper autour de ChromaDB PersistentClient pour le stockage et la récupération de documents.
     """
 
     def __init__(
         self,
-        collection_name: str = "documents",
-        persist_directory: str = "data/chroma",
-        embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2",
+        collection_name: str = "rag_documents",
+        persist_directory: Optional[Path] = None,
     ) -> None:
         """
-        EN: Initialize ChromaDB persistent client and collection.
+        EN: Initialize the ChromaDB persistent client and collection.
         FR: Initialiser le client persistant ChromaDB et la collection.
         """
-        self._client = chromadb.PersistentClient(path=persist_directory)
+        self._persist_dir = persist_directory or settings.chroma_db_path
+        self._persist_dir.mkdir(parents=True, exist_ok=True)
+
+        self._client = chromadb.PersistentClient(
+            path=str(self._persist_dir),
+            settings=ChromaSettings(anonymized_telemetry=False),
+        )
         self._collection = self._client.get_or_create_collection(name=collection_name)
-        self._embeddings = EmbeddingClient(model_name=embedding_model)
+        self._embedder = EmbeddingClient(model_name=settings.embedding_model)
 
-    def add_documents(self, texts: list[str], ids: list[str] | None = None) -> None:
+    def add_documents(self, documents: list[str], ids: list[str]) -> None:
         """
-        EN: Add documents to the vector store.
-        FR: Ajouter des documents dans la base vectorielle.
+        EN: Add documents to the vector store with auto-generated embeddings.
+        FR: Ajouter des documents à la base vectorielle avec embeddings auto-générés.
         """
-        if ids is None:
-            ids = [str(i) for i in range(len(texts))]
+        if not documents:
+            return
 
-        embeddings = self._embeddings.embed_documents(texts)
+        embeddings = self._embedder.embed_documents(documents)
+        
+        # EN: ChromaDB accepts list[list[float]] at runtime; stubs are overly strict
+        # FR: ChromaDB accepte list[list[float]] à l'exécution; les stubs sont trop stricts
         self._collection.add(
             ids=ids,
-            documents=texts,
-            embeddings=embeddings,
+            documents=documents,
+            embeddings=embeddings,  # type: ignore[arg-type]
         )
 
-    def query(self, query_text: str, top_k: int = 5) -> list[tuple[str, float]]:
+    def retrieve(self, query: str, top_k: int = 5) -> list[str]:
         """
-        EN: Query the most similar documents.
-        FR: Rechercher les documents les plus similaires.
+        EN: Retrieve the top_k most relevant documents for a query.
+        FR: Récupérer les top_k documents les plus pertinents pour une requête.
         """
-        query_embedding = self._embeddings.embed_text(query_text)
+        query_embedding = self._embedder.embed_text(query)
+        
+        # EN: ChromaDB accepts list[float] at runtime; stubs are overly strict
+        # FR: ChromaDB accepte list[float] à l'exécution; les stubs sont trop stricts
         results = self._collection.query(
-            query_embeddings=[query_embedding],
+            query_embeddings=[query_embedding],  # type: ignore[arg-type]
             n_results=top_k,
+            include=["documents"],
         )
 
-        documents = results.get("documents", [[]])[0]
-        distances = results.get("distances", [[]])[0]
-
-        # Safely pair documents with distances (handle potential None values)
-        # Safely pair documents with distances (handle potential None values)
-        return [
-            (doc, dist if dist is not None else 0.0)
-            for doc, dist in zip(documents, distances, strict=True)
-        ]
+        # EN: Handle Optional return types safely
+        # FR: Gérer les types de retour Optionnels de manière sûre
+        documents = results.get("documents")
+        if documents and documents[0]:
+            return documents[0]
+        
+        return []

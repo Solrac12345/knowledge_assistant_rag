@@ -3,12 +3,15 @@ pyproject.toml
 app/__init__.py
 app/main.py
 app/api/v1/__init__.py
+app/api/v1/models_rag.py
 app/api/v1/routes_rag.py
 app/core/__init__.py
 app/core/logging.py
 app/core/settings.py
 app/llm/__init__.py
-app/llm/client.py
+app/llm/base.py
+app/llm/dummy_client.py
+app/llm/ollama_client.py
 app/models/__init__.py
 app/models/schemas.py
 app/rag/__init__.py
