@@ -1,8 +1,8 @@
 # EN: FastAPI application entry point.
 # FR: Point d'entrée de l'application FastAPI.
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 

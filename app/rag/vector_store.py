@@ -3,7 +3,6 @@
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 import chromadb
 from chromadb.config import Settings as ChromaSettings
@@ -23,7 +22,7 @@ class VectorStore:
     def __init__(
         self,
         collection_name: str = "rag_documents",
-        persist_directory: Optional[Path] = None,
+        persist_directory: Path | None = None,
     ) -> None:
         """
         EN: Initialize the ChromaDB persistent client and collection.
@@ -48,7 +47,7 @@ class VectorStore:
             return
 
         embeddings = self._embedder.embed_documents(documents)
-        
+
         # EN: ChromaDB accepts list[list[float]] at runtime; stubs are overly strict
         # FR: ChromaDB accepte list[list[float]] à l'exécution; les stubs sont trop stricts
         self._collection.add(
@@ -63,7 +62,7 @@ class VectorStore:
         FR: Récupérer les top_k documents les plus pertinents pour une requête.
         """
         query_embedding = self._embedder.embed_text(query)
-        
+
         # EN: ChromaDB accepts list[float] at runtime; stubs are overly strict
         # FR: ChromaDB accepte list[float] à l'exécution; les stubs sont trop stricts
         results = self._collection.query(
@@ -77,5 +76,5 @@ class VectorStore:
         documents = results.get("documents")
         if documents and documents[0]:
             return documents[0]
-        
+
         return []

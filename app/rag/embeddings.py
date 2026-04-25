@@ -31,4 +31,4 @@ class EmbeddingClient:
         FR: Générer des embeddings pour plusieurs documents/blocs.
         """
         embeddings = self._model.encode(texts)
-        return [e.tolist() for e in embeddings]  
+        return [e.tolist() for e in embeddings]

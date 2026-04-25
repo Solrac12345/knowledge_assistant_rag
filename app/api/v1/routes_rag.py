@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 # REMOVED: _pipeline = RAGPipeline()
 # Reason: Initialization is now handled in main.py lifespan
 
+
 @router.post(
     "/index",
     status_code=201,

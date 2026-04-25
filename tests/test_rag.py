@@ -1,7 +1,6 @@
 # EN: Integration tests for the RAG API endpoints.
 # FR: Tests d'intégration pour les endpoints de l'API RAG.
 
-import io
 import pytest
 from fastapi.testclient import TestClient
 
@@ -53,13 +52,13 @@ def test_ask_question_structure(client: TestClient) -> None:
     EN: Test the query endpoint structure (returns valid JSON with answer).
     FR: Tester la structure de l'endpoint de requête (renvoie un JSON valide avec réponse).
     """
-    # Note: This test checks the structure. If LLM_PROVIDER=dummy, 
+    # Note: This test checks the structure. If LLM_PROVIDER=dummy,
     # the answer will be the dummy response.
     response = client.get("/api/v1/rag/ask", params={"query": "What is this document?"})
 
     assert response.status_code == 200
     data = response.json()
-    
+
     # Validate Pydantic Model structure
     assert "query" in data
     assert "answer" in data
@@ -73,6 +72,6 @@ def test_ask_question_empty_query(client: TestClient) -> None:
     FR: Vérifier qu'une requête vide renvoie une erreur 400 Bad Request.
     """
     response = client.get("/api/v1/rag/ask", params={"query": "   "})
-    
+
     assert response.status_code == 400
     assert "Query cannot be empty" in response.json()["detail"]
