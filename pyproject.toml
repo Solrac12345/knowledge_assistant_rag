@@ -93,3 +93,8 @@ addopts = "--tb=short"
 [tool.setuptools.packages.find]
 include = ["app*"]
 exclude = ["data*", "tests*", "docs*"]
+
+[dependency-groups]
+dev = [
+    "pytest-cov>=7.1.0",
+]
