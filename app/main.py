@@ -11,10 +11,15 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from app.api.v1.routes_rag import router as rag_router
 from app.core.limiter import limiter
+from app.core.logging import logging_middleware, setup_logging
 from app.core.security import verify_api_key
 from app.core.settings import settings
 from app.llm import get_llm_client
 from app.rag.pipeline import RAGPipeline
+
+# EN: Initialize logging immediately so startup messages are structured
+# FR: Initialiser la journalisation immédiatement pour que les messages de démarrage soient structurés
+setup_logging()
 
 
 @asynccontextmanager
@@ -39,6 +44,10 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 
+# EN: Add the logging middleware
+# FR: Ajouter le middleware de journalisation
+app.middleware("http")(logging_middleware)
+
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
@@ -50,7 +59,7 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONRe
             "error": "rate_limit_exceeded",
             "detail": (
                 f"Too many requests. Limit: {settings.rate_limit_requests} per {settings.rate_limit_window}s."
-            ),  # ✅ Removed type: ignore
+            ),
             "retry_after": retry_after,
         },
         headers={"Retry-After": str(retry_after)},
