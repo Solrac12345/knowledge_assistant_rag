@@ -48,8 +48,9 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONRe
         status_code=429,
         content={
             "error": "rate_limit_exceeded",
-            # ✅ Add ignore here because mypy can't see the dynamic settings attribute
-            "detail": f"Too many requests. Limit: {settings.rate_limit_requests} per {settings.rate_limit_window}s.",  # type: ignore[attr-defined]
+            "detail": (
+                f"Too many requests. Limit: {settings.rate_limit_requests} per {settings.rate_limit_window}s."
+            ),  # ✅ Removed type: ignore
             "retry_after": retry_after,
         },
         headers={"Retry-After": str(retry_after)},

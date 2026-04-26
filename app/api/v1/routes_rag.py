@@ -23,10 +23,12 @@ logger = logging.getLogger(__name__)
     response_model=IndexResponse,
     responses={500: {"model": ErrorResponse}},
 )
-@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")  # type: ignore[attr-defined]
+@limiter.limit(
+    f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds"
+)  # ✅ Removed type: ignore
 async def index_document(
     request: Request,
-    file: UploadFile = File(...),  # noqa: B008
+    file: UploadFile = File(...),
 ) -> IndexResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename is required")
@@ -52,7 +54,9 @@ async def index_document(
     response_model=QueryResponse,
     responses={500: {"model": ErrorResponse}},
 )
-@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")  # type: ignore[attr-defined]
+@limiter.limit(
+    f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds"
+)  # ✅ Removed type: ignore
 async def ask_question(
     request: Request,
     query: str,
