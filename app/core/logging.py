@@ -8,7 +8,7 @@ from time import time
 from typing import Any
 
 from fastapi import Request, Response
-from pythonjsonlogger import jsonlogger  # ✅ Removed unused ignore
+from pythonjsonlogger import jsonlogger
 
 # EN: Initialize the application logger
 # FR: Initialiser le logger de l'application
@@ -16,7 +16,7 @@ logger = logging.getLogger("rag_assistant")
 logger.setLevel(logging.INFO)
 
 
-class CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore[misc]
+class CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore[name-defined]  # type: ignore[misc]
     """
     EN: Custom formatter to add fields like process time and request ID.
     FR: Formateur personnalisé pour ajouter des champs comme le temps de traitement et l'ID de requête.
