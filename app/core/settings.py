@@ -4,6 +4,7 @@
 from pathlib import Path
 from typing import Literal
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,6 +19,13 @@ class Settings(BaseSettings):
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     llm_api_key: str | None = None
     llm_base_url: str | None = None
+
+    # 🔐 API Key for endpoint protection (required in production)
+    api_key: str = Field(
+        default="dev-key-do-not-use-in-production",
+        description="API key for protecting /api/v1/rag/* endpoints",
+        validation_alias="API_KEY"  # ← Pydantic v2 syntax (not 'env')
+    )
 
     # 🔑 NEW: LLM Provider selector (matches factory logic)
     llm_provider: Literal["ollama", "dummy"] = "dummy"

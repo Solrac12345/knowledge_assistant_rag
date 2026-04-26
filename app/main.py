@@ -4,9 +4,10 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 from app.api.v1.routes_rag import router as rag_router
+from app.core.security import verify_api_key
 from app.llm import get_llm_client
 from app.rag.pipeline import RAGPipeline
 
@@ -33,9 +34,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# EN: Include RAG router (Note: prefix matches your screenshot /api/v1/rag)
-# FR: Inclure le routeur RAG (Note: le préfixe correspond à votre screenshot)
-app.include_router(rag_router, prefix="/api/v1/rag", tags=["rag"])
+# EN: Include RAG router WITH authentication dependency
+# FR: Inclure le routeur RAG AVEC dépendance d'authentification
+app.include_router(
+    rag_router,
+    prefix="/api/v1/rag",
+    tags=["rag"],
+    dependencies=[Depends(verify_api_key)],  # ← Now Depends is imported
+)
 
 
 @app.get("/", tags=["health"])
