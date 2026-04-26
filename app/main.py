@@ -41,7 +41,12 @@ app.add_middleware(SlowAPIMiddleware)
 
 
 @app.exception_handler(RateLimitExceeded)
-async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+async def rate_limit_handler(
+    request: Request, exc: RateLimitExceeded
+) -> JSONResponse:  # ✅ Added return type
+    # ✅ Access retry_after via getattr for mypy compatibility
+    retry_after = getattr(exc, "retry_after", 60)
+
     return JSONResponse(
         status_code=429,
         content={
@@ -49,9 +54,9 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
             "detail": (
                 f"Too many requests. Limit: {settings.rate_limit_requests} per {settings.rate_limit_window}s."
             ),
-            "retry_after": exc.retry_after,
+            "retry_after": retry_after,
         },
-        headers={"Retry-After": str(exc.retry_after)},
+        headers={"Retry-After": str(retry_after)},
     )
 
 

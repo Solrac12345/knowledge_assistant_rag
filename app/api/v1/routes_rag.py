@@ -9,13 +9,12 @@ from pathlib import Path
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
 from app.api.v1.models_rag import ErrorResponse, IndexResponse, QueryResponse
-from app.core import limiter, settings
+from app.core.limiter import limiter
+from app.core.settings import settings
 from app.rag.pipeline import RAGPipeline
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
-# REMOVED: _pipeline = RAGPipeline()
-# Reason: Initialization is now handled in main.py lifespan
 
 
 @router.post(
@@ -24,16 +23,14 @@ logger = logging.getLogger(__name__)
     response_model=IndexResponse,
     responses={500: {"model": ErrorResponse}},
 )
-@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")
+@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")  # type: ignore[misc]
 async def index_document(
-    request: Request,  # <--- Access app.state here
+    request: Request,
     file: UploadFile = File(...),  # noqa: B008
 ) -> IndexResponse:
     if not file.filename:
         raise HTTPException(status_code=400, detail="Filename is required")
 
-    # EN: Get the shared pipeline instance
-    # FR: Récupérer l'instance partagée du pipeline
     pipeline: RAGPipeline = request.app.state.pipeline
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=Path(file.filename).suffix) as tmp:
@@ -55,17 +52,15 @@ async def index_document(
     response_model=QueryResponse,
     responses={500: {"model": ErrorResponse}},
 )
-@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")
+@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")  # type: ignore[misc]
 async def ask_question(
-    request: Request,  # <--- Access app.state here
+    request: Request,
     query: str,
     top_k: int = 5,
 ) -> QueryResponse:
     if not query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty")
 
-    # EN: Get the shared pipeline instance
-    # FR: Récupérer l'instance partagée du pipeline
     pipeline: RAGPipeline = request.app.state.pipeline
 
     try:

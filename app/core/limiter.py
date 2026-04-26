@@ -1,8 +1,13 @@
 # EN: Rate limiter configuration using SlowAPI.
 # FR: Configuration du limiteur de débit avec SlowAPI.
 
+from typing import TYPE_CHECKING
+
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+
+if TYPE_CHECKING:
+    pass
 
 from app.core.settings import settings
 
