@@ -9,6 +9,7 @@ from pathlib import Path
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 
 from app.api.v1.models_rag import ErrorResponse, IndexResponse, QueryResponse
+from app.core import limiter, settings
 from app.rag.pipeline import RAGPipeline
 
 router = APIRouter()
@@ -23,6 +24,7 @@ logger = logging.getLogger(__name__)
     response_model=IndexResponse,
     responses={500: {"model": ErrorResponse}},
 )
+@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")
 async def index_document(
     request: Request,  # <--- Access app.state here
     file: UploadFile = File(...),  # noqa: B008
@@ -53,6 +55,7 @@ async def index_document(
     response_model=QueryResponse,
     responses={500: {"model": ErrorResponse}},
 )
+@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")
 async def ask_question(
     request: Request,  # <--- Access app.state here
     query: str,
