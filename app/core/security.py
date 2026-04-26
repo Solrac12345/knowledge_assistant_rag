@@ -1,7 +1,7 @@
 # EN: Security utilities: API key authentication middleware.
 # FR: Utilitaires de sécurité : middleware d'authentification par clé API.
 
-from fastapi import Depends, HTTPException, status, Request
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import APIKeyHeader
 
 from app.core.settings import settings

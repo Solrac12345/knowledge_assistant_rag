@@ -4,7 +4,7 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 
 from app.api.v1.routes_rag import router as rag_router
 from app.core.security import verify_api_key

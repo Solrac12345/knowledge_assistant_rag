@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     api_key: str = Field(
         default="dev-key-do-not-use-in-production",
         description="API key for protecting /api/v1/rag/* endpoints",
-        validation_alias="API_KEY"  # ← Pydantic v2 syntax (not 'env')
+        validation_alias="API_KEY",  # ← Pydantic v2 syntax (not 'env')
     )
 
     # 🔑 NEW: LLM Provider selector (matches factory logic)
