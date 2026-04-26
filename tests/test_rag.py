@@ -4,6 +4,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.settings import settings
 from app.main import app
 
 
@@ -37,8 +38,11 @@ def test_index_document(client: TestClient) -> None:
     file_content = b"This is a test document for the RAG system. It contains AI context."
     file_data = {"file": ("test_sol.txt", file_content, "text/plain")}
 
+    # 🔐 Add API key header for authenticated request
+    headers = {"X-API-Key": settings.api_key}
+    
     # Send POST request to the index endpoint
-    response = client.post("/api/v1/rag/index", files=file_data)
+    response = client.post("/api/v1/rag/index", files=file_data, headers=headers)
 
     # Assert response
     assert response.status_code == 201
@@ -52,13 +56,18 @@ def test_ask_question_structure(client: TestClient) -> None:
     EN: Test the query endpoint structure (returns valid JSON with answer).
     FR: Tester la structure de l'endpoint de requête (renvoie un JSON valide avec réponse).
     """
-    # Note: This test checks the structure. If LLM_PROVIDER=dummy,
-    # the answer will be the dummy response.
-    response = client.get("/api/v1/rag/ask", params={"query": "What is this document?"})
+    # 🔐 Add API key header for authenticated request
+    headers = {"X-API-Key": settings.api_key}
+    
+    response = client.get(
+        "/api/v1/rag/ask",
+        params={"query": "What is this document?"},
+        headers=headers,
+    )
 
     assert response.status_code == 200
     data = response.json()
-
+    
     # Validate Pydantic Model structure
     assert "query" in data
     assert "answer" in data
@@ -71,7 +80,43 @@ def test_ask_question_empty_query(client: TestClient) -> None:
     EN: Test that an empty query returns a 400 Bad Request error.
     FR: Vérifier qu'une requête vide renvoie une erreur 400 Bad Request.
     """
-    response = client.get("/api/v1/rag/ask", params={"query": "   "})
-
+    # 🔐 Add API key header for authenticated request
+    headers = {"X-API-Key": settings.api_key}
+    
+    response = client.get(
+        "/api/v1/rag/ask",
+        params={"query": "   "},
+        headers=headers,
+    )
+    
     assert response.status_code == 400
     assert "Query cannot be empty" in response.json()["detail"]
+
+
+def test_missing_api_key(client: TestClient) -> None:
+    """
+    EN: Test that requests without API key return 401 Unauthorized.
+    FR: Vérifier que les requêtes sans clé API retournent 401 Unauthorized.
+    """
+    # 🔐 Test without API key (should fail)
+    response = client.get("/api/v1/rag/ask", params={"query": "Test"})
+    
+    assert response.status_code == 401
+    assert "Missing API key" in response.json()["detail"]
+
+
+def test_invalid_api_key(client: TestClient) -> None:
+    """
+    EN: Test that invalid API key returns 403 Forbidden.
+    FR: Vérifier que la clé API invalide retourne 403 Forbidden.
+    """
+    # 🔐 Test with wrong API key
+    headers = {"X-API-Key": "wrong-key"}
+    response = client.get(
+        "/api/v1/rag/ask",
+        params={"query": "Test"},
+        headers=headers,
+    )
+    
+    assert response.status_code == 403
+    assert "Invalid API key" in response.json()["detail"]

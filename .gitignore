@@ -17,9 +17,7 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
-EOFrag_assistant.egg-info/
-uv.lock
-.env
+EOFrag_assistant.egg-info/.env
 
 # EN: CI/CD artifacts
 # FR: Artefacts CI/CD
