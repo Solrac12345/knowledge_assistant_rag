@@ -16,7 +16,7 @@ logger = logging.getLogger("rag_assistant")
 logger.setLevel(logging.INFO)
 
 
-class CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore[misc]
+class CustomJsonFormatter(jsonlogger.JsonFormatter):  # ✅ Removed unused type: ignore
     """
     EN: Custom formatter to add fields like process time and request ID.
     FR: Formateur personnalisé pour ajouter des champs comme le temps de traitement et l'ID de requête.
