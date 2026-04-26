@@ -20,6 +20,18 @@ class Settings(BaseSettings):
     llm_api_key: str | None = None
     llm_base_url: str | None = None
 
+    rate_limit_requests: int = Field(
+        default=60,
+        description="Max requests per time window",
+        validation_alias="RATE_LIMIT_REQUESTS",
+    )
+
+    rate_limit_window: int = Field(
+        default=60,  # seconds
+        description="Time window in seconds for rate limiting",
+        validation_alias="RATE_LIMIT_WINDOW",
+    )
+
     # 🔐 API Key for endpoint protection (required in production)
     api_key: str = Field(
         default="dev-key-do-not-use-in-production",
