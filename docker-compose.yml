@@ -1,0 +1,27 @@
+# EN: Docker Compose orchestration for RAG Knowledge Assistant
+# FR: Orchestration Docker Compose pour l'Assistant de Connaissance RAG
+
+services:
+  app:
+    build: .
+    container_name: rag-app
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - LLM_PROVIDER=${LLM_PROVIDER:-dummy}
+      - CHROMA_DB_PATH=/app/data/chroma
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-sentence-transformers/all-MiniLM-L6-v2}
+    volumes:
+      - chroma_data:/app/data/chroma
+      - ./.env:/app/.env:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  chroma_data:

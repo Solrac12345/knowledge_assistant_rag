@@ -1,0 +1,20 @@
+# EN: Exclude files from Docker build context
+# FR: Exclure les fichiers du contexte de construction Docker
+
+.git
+.github
+.venv
+.env
+__pycache__
+.mypy_cache
+.pytest_cache
+.ruff_cache
+htmlcov
+coverage.xml
+*.md
+tests
+data
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
