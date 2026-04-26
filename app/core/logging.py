@@ -5,9 +5,10 @@ import logging
 import sys
 import uuid
 from time import time
+from typing import Any
 
 from fastapi import Request, Response
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger import jsonlogger  # type: ignore[import-untyped]
 
 # EN: Initialize the application logger
 # FR: Initialiser le logger de l'application
@@ -15,13 +16,15 @@ logger = logging.getLogger("rag_assistant")
 logger.setLevel(logging.INFO)
 
 
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
+class CustomJsonFormatter(jsonlogger.JsonFormatter):  # type: ignore[misc]
     """
     EN: Custom formatter to add fields like process time and request ID.
     FR: Formateur personnalisé pour ajouter des champs comme le temps de traitement et l'ID de requête.
     """
 
-    def add_fields(self, log_record, record, message_dict):
+    def add_fields(
+        self, log_record: dict[str, Any], record: logging.LogRecord, message_dict: dict[str, Any]
+    ) -> None:
         super().add_fields(log_record, record, message_dict)
 
         # EN: Ensure standard fields are present and correctly named
@@ -35,7 +38,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
             log_record["level"] = record.levelname
 
 
-def setup_logging():
+def setup_logging() -> None:
     """
     EN: Configure the root logger to output JSON to stdout.
     FR: Configurer le logger racine pour sortir du JSON vers stdout.
@@ -52,7 +55,7 @@ def setup_logging():
     logger.info("Structured logging initialized.")
 
 
-async def logging_middleware(request: Request, call_next):
+async def logging_middleware(request: Request, call_next: Any) -> Response:
     """
     EN: Middleware to log every request with correlation IDs and latency.
     FR: Middleware pour logger chaque requête avec des IDs de corrélation et la latence.

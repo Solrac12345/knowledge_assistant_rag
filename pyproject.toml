@@ -75,6 +75,7 @@ module = [
     "httpx.*",
     "pydantic_settings.*",
     "fastapi.*",
+    "pythonjsonlogger.*",
 ]
 ignore_missing_imports = true
 
