@@ -40,7 +40,7 @@ async def verify_api_key(
     # FR: Valider la clé
     if api_key_header != settings.api_key:
         raise HTTPException(
-            status_code=status.HTTP_03_FORBIDDEN,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid API key.",
             headers={"WWW-Authenticate": "ApiKey"},
         )
