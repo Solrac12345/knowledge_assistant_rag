@@ -40,7 +40,7 @@ def test_index_document(client: TestClient) -> None:
 
     # 🔐 Add API key header for authenticated request
     headers = {"X-API-Key": settings.api_key}
-    
+
     # Send POST request to the index endpoint
     response = client.post("/api/v1/rag/index", files=file_data, headers=headers)
 
@@ -58,7 +58,7 @@ def test_ask_question_structure(client: TestClient) -> None:
     """
     # 🔐 Add API key header for authenticated request
     headers = {"X-API-Key": settings.api_key}
-    
+
     response = client.get(
         "/api/v1/rag/ask",
         params={"query": "What is this document?"},
@@ -67,7 +67,7 @@ def test_ask_question_structure(client: TestClient) -> None:
 
     assert response.status_code == 200
     data = response.json()
-    
+
     # Validate Pydantic Model structure
     assert "query" in data
     assert "answer" in data
@@ -82,13 +82,13 @@ def test_ask_question_empty_query(client: TestClient) -> None:
     """
     # 🔐 Add API key header for authenticated request
     headers = {"X-API-Key": settings.api_key}
-    
+
     response = client.get(
         "/api/v1/rag/ask",
         params={"query": "   "},
         headers=headers,
     )
-    
+
     assert response.status_code == 400
     assert "Query cannot be empty" in response.json()["detail"]
 
@@ -100,7 +100,7 @@ def test_missing_api_key(client: TestClient) -> None:
     """
     # 🔐 Test without API key (should fail)
     response = client.get("/api/v1/rag/ask", params={"query": "Test"})
-    
+
     assert response.status_code == 401
     assert "Missing API key" in response.json()["detail"]
 
@@ -117,6 +117,6 @@ def test_invalid_api_key(client: TestClient) -> None:
         params={"query": "Test"},
         headers=headers,
     )
-    
+
     assert response.status_code == 403
     assert "Invalid API key" in response.json()["detail"]
