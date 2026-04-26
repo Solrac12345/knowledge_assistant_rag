@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
     response_model=IndexResponse,
     responses={500: {"model": ErrorResponse}},
 )
-@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")  # type: ignore[misc]
+@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")  # type: ignore[attr-defined]
 async def index_document(
     request: Request,
     file: UploadFile = File(...),  # noqa: B008
@@ -52,7 +52,7 @@ async def index_document(
     response_model=QueryResponse,
     responses={500: {"model": ErrorResponse}},
 )
-@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")  # type: ignore[misc]
+@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window}seconds")  # type: ignore[attr-defined]
 async def ask_question(
     request: Request,
     query: str,

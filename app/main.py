@@ -41,19 +41,15 @@ app.add_middleware(SlowAPIMiddleware)
 
 
 @app.exception_handler(RateLimitExceeded)
-async def rate_limit_handler(
-    request: Request, exc: RateLimitExceeded
-) -> JSONResponse:  # ✅ Added return type
-    # ✅ Access retry_after via getattr for mypy compatibility
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
     retry_after = getattr(exc, "retry_after", 60)
 
     return JSONResponse(
         status_code=429,
         content={
             "error": "rate_limit_exceeded",
-            "detail": (
-                f"Too many requests. Limit: {settings.rate_limit_requests} per {settings.rate_limit_window}s."
-            ),
+            # ✅ Add ignore here because mypy can't see the dynamic settings attribute
+            "detail": f"Too many requests. Limit: {settings.rate_limit_requests} per {settings.rate_limit_window}s.",  # type: ignore[attr-defined]
             "retry_after": retry_after,
         },
         headers={"Retry-After": str(retry_after)},
