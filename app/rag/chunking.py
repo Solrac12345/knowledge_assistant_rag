@@ -84,7 +84,7 @@ def _apply_overlap(chunks: list[str], overlap: int) -> list[str]:
         return chunks
 
     result: list[str] = [chunks[0]]  # First chunk unchanged
-    
+
     for i in range(1, len(chunks)):
         prefix = chunks[i - 1][-overlap:]
         # Avoid duplicating text that already starts with the prefix
@@ -92,5 +92,5 @@ def _apply_overlap(chunks: list[str], overlap: int) -> list[str]:
             result.append(chunks[i])
         else:
             result.append(prefix + chunks[i])
-    
+
     return result
