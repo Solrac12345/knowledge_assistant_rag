@@ -4,8 +4,8 @@
 
 def recursive_chunk(
     text: str,
-    chunk_size: int = 500,
-    chunk_overlap: int = 50,
+    chunk_size: int = 120,
+    chunk_overlap: int = 20,
     separators: list[str] | None = None,
 ) -> list[str]:
     """
@@ -80,15 +80,17 @@ def _apply_overlap(chunks: list[str], overlap: int) -> list[str]:
     EN: Add character-level overlap between consecutive chunks.
     FR: Ajouter un chevauchement au niveau des caractères entre les blocs consécutifs.
     """
-    if overlap <= 0:
+    if overlap <= 0 or len(chunks) <= 1:
         return chunks
 
-    result: list[str] = []
-    for i, chunk in enumerate(chunks):
-        if i == 0:
-            result.append(chunk)
+    result: list[str] = [chunks[0]]  # First chunk unchanged
+    
+    for i in range(1, len(chunks)):
+        prefix = chunks[i - 1][-overlap:]
+        # Avoid duplicating text that already starts with the prefix
+        if chunks[i].startswith(prefix):
+            result.append(chunks[i])
         else:
-            # Take the last `overlap` chars from previous chunk as prefix
-            prefix = chunks[i - 1][-overlap:]
-            result.append(prefix + chunk)
+            result.append(prefix + chunks[i])
+    
     return result

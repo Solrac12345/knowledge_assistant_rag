@@ -25,3 +25,6 @@ EOFrag_assistant.egg-info/.env
 .coverage
 coverage.xml
 htmlcov/
+
+# Build artifacts
+*.egg-info/
