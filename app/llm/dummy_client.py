@@ -54,7 +54,10 @@ def _is_valid_answer_sentence(sentence: str) -> bool:
         return False
     if re.fullmatch(r"[A-Z0-9\s:\-]+", sentence):
         return False
-    if re.search(r"\b(?:policy|section)\s+\d{4}\b", sentence, re.IGNORECASE) and "." not in sentence:
+    if (
+        re.search(r"\b(?:policy|section)\s+\d{4}\b", sentence, re.IGNORECASE)
+        and "." not in sentence
+    ):
         return False
     if sentence[0].islower():
         return False

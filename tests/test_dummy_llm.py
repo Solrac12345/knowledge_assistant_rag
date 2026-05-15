@@ -13,9 +13,7 @@ VACATION_CONTEXT = (
     "Part-time employees receive prorated vacation."
 )
 REMOTE_CONTEXT = "Employees may work remotely up to 3 days per week with manager approval."
-GLUED_HEALTH_CONTEXT = (
-    "and vision coverageEmployees can choose between PPO and HMO plans during open enrollment in November."
-)
+GLUED_HEALTH_CONTEXT = "and vision coverageEmployees can choose between PPO and HMO plans during open enrollment in November."
 GLUED_REMOTE_CONTEXT = (
     "REMOTE WORK POLICYEmployees may work remotely up to 3 days per week with manager approval."
 )
