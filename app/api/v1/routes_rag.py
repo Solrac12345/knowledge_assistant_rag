@@ -40,7 +40,7 @@ async def index_document(
         shutil.copyfileobj(file.file, tmp)
 
     try:
-        pipeline.index_document(str(tmp_path))
+        pipeline.index_document(str(tmp_path), source_id=file.filename)
         return IndexResponse(status="indexed", filename=file.filename)
     except Exception as e:
         logger.error("Indexing failed for %s: %s", file.filename, e, exc_info=True)

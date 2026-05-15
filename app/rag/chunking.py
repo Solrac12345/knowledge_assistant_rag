@@ -1,11 +1,13 @@
 # EN: Text chunking utilities for the RAG pipeline.
 # FR: Utilitaires de découpage de texte pour le pipeline RAG.
 
+import re
+
 
 def recursive_chunk(
     text: str,
-    chunk_size: int = 120,
-    chunk_overlap: int = 20,
+    chunk_size: int = 256,
+    chunk_overlap: int = 40,
     separators: list[str] | None = None,
 ) -> list[str]:
     """
@@ -21,6 +23,8 @@ def recursive_chunk(
     Returns:
         List of text chunks ready for embedding.
     """
+    text = re.sub(r"\.([A-Z])", r". \1", text)
+
     if separators is None:
         # EN: Split by semantic boundaries, from most to least preferred.
         # FR: Découper par frontières sémantiques, du plus au moins prioritaire.
@@ -75,22 +79,50 @@ def recursive_chunk(
     return [text.strip()] if text.strip() else []
 
 
+def _overlap_prefix(previous: str, overlap: int) -> str:
+    """
+    EN: Take a suffix for overlap, aligned to a word boundary.
+    FR: Prendre un suffixe pour le chevauchement, aligné sur une limite de mot.
+    """
+    if overlap <= 0:
+        return ""
+    prefix = previous[-overlap:]
+    word_start = prefix.find(" ")
+    if word_start != -1:
+        prefix = prefix[word_start + 1 :]
+    return prefix
+
+
+def _merge_with_overlap(prefix: str, chunk: str) -> str:
+    """
+    EN: Join overlap prefix and chunk without gluing words together.
+    FR: Joindre le préfixe de chevauchement et le bloc sans coller les mots.
+    """
+    if not prefix:
+        return chunk
+    if chunk.startswith(prefix):
+        return chunk
+    needs_space = (
+        prefix[-1].isalnum()
+        and chunk[0].isalnum()
+        and not prefix.endswith(" ")
+        and not chunk.startswith(" ")
+    )
+    return f"{prefix} {chunk}" if needs_space else prefix + chunk
+
+
 def _apply_overlap(chunks: list[str], overlap: int) -> list[str]:
     """
-    EN: Add character-level overlap between consecutive chunks.
-    FR: Ajouter un chevauchement au niveau des caractères entre les blocs consécutifs.
+    EN: Add word-aware overlap between consecutive chunks.
+    FR: Ajouter un chevauchement conscient des mots entre les blocs consécutifs.
     """
     if overlap <= 0 or len(chunks) <= 1:
         return chunks
 
-    result: list[str] = [chunks[0]]  # First chunk unchanged
+    result: list[str] = [chunks[0]]
 
     for i in range(1, len(chunks)):
-        prefix = chunks[i - 1][-overlap:]
-        # Avoid duplicating text that already starts with the prefix
-        if chunks[i].startswith(prefix):
-            result.append(chunks[i])
-        else:
-            result.append(prefix + chunks[i])
+        prefix = _overlap_prefix(chunks[i - 1], overlap)
+        result.append(_merge_with_overlap(prefix, chunks[i]))
 
     return result

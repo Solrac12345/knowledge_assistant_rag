@@ -7,7 +7,8 @@ SECTION 2: REMOTE WORK POLICY
 Employees may work remotely up to 3 days per week with manager approval. Remote work requests should be submitted every Monday via Slack to your direct supervisor. Equipment stipends of up to $500 are available for home office setup. IT support for remote employees is available Monday-Friday, 8 AM to 6 PM EST.
 
 SECTION 3: HEALTH BENEFITS
-The company provides comprehensive health insurance including medical, dental, and vision coverage. Employees can choose between PPO and HMO plans during open enrollment in November. Dependents may be added within 30 days of hire. For benefits questions, email benefits@company.com or call extension 222.
+The company provides comprehensive health insurance including medical, dental, and vision coverage. 
+Employees can choose between PPO and HMO plans during open enrollment in November. Dependents may be added within 30 days of hire. For benefits questions, email benefits@company.com or call extension 222.
 
 SECTION 4: PROFESSIONAL DEVELOPMENT
 Each employee receives an annual learning stipend of $1,200 for courses, conferences, or certifications. Requests must include a business justification and be approved by your manager. Reimbursement is processed within 2 weeks of course completion. Popular platforms include Coursera, Udemy, and LinkedIn Learning.

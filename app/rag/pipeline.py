@@ -29,14 +29,16 @@ class RAGPipeline:
         self._retriever = retriever or Retriever(self._store)
         self._llm = llm_client or DummyLLMClient()
 
-    def index_document(self, path: str) -> None:
+    def index_document(self, path: str, source_id: str | None = None) -> None:
         """
         EN: Ingest a document from disk, chunk it, and add to the vector store.
         FR: Ingérer un document depuis le disque, le découper et l'ajouter à la base vectorielle.
         """
+        doc_id = source_id or path
         text = ingest_document(path)
         chunks: list[str] = recursive_chunk(text)
-        ids = [f"{path}::chunk-{i}" for i in range(len(chunks))]
+        self._store.delete_by_source(doc_id)
+        ids = [f"{doc_id}::chunk-{i}" for i in range(len(chunks))]
         self._store.add_documents(chunks, ids=ids)
         # PersistentClient auto-saves; .persist() is deprecated in modern ChromaDB
 

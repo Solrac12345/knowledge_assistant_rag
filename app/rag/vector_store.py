@@ -38,6 +38,19 @@ class VectorStore:
         self._collection = self._client.get_or_create_collection(name=collection_name)
         self._embedder = EmbeddingClient(model_name=settings.embedding_model)
 
+    def delete_by_source(self, source_id: str) -> None:
+        """
+        EN: Remove all chunks previously indexed for a document source id.
+        FR: Supprimer tous les blocs précédemment indexés pour un identifiant source.
+        """
+        prefix = f"{source_id}::"
+        batch = self._collection.get()
+        ids = batch.get("ids") or []
+        to_delete = [doc_id for doc_id in ids if doc_id.startswith(prefix)]
+        if to_delete:
+            self._collection.delete(ids=to_delete)
+            logger.info("Deleted %d chunks for source %s", len(to_delete), source_id)
+
     def add_documents(self, documents: list[str], ids: list[str]) -> None:
         """
         EN: Add documents to the vector store with auto-generated embeddings.
@@ -75,6 +88,12 @@ class VectorStore:
         # FR: Gérer les types de retour Optionnels de manière sûre
         documents = results.get("documents")
         if documents and documents[0]:
-            return documents[0]
+            unique: list[str] = []
+            seen: set[str] = set()
+            for doc in documents[0]:
+                if doc not in seen:
+                    seen.add(doc)
+                    unique.append(doc)
+            return unique
 
         return []
